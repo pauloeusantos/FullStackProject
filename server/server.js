@@ -1,19 +1,12 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { Sequelize, DataTypes } = require('sequelize');
+const { sequelize, DataTypes } = require('./bd/bd'); // Importar DataTypes
 const productRoutes = require('./routes/productRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configuração do Sequelize com SQLite
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite'
-});
-
-// Definição do modelo Product
 const Product = sequelize.define('Product', {
   name: {
     type: DataTypes.STRING,

@@ -6,6 +6,7 @@ import ProductDetail from './components/ProductDetail';
 import { Button, Card, Modal, Spinner } from 'flowbite-react';
 import { PlusIcon } from 'lucide-react';
 import { NotificationProvider, useNotification } from './contexts/NotificationContext';
+import { AnimatePresence } from 'framer-motion';
 
 const AppContent = () => {
     const [products, setProducts] = useState([]);
@@ -127,6 +128,17 @@ const AppContent = () => {
                     />
                 </Modal.Body>
             </Modal>
+
+            <AnimatePresence>
+                {notifications.map((notification) => (
+                    <Notification
+                        key={notification.id}
+                        id={notification.id}
+                        message={notification.message}
+                        type={notification.type}
+                    />
+                ))}
+            </AnimatePresence>
         </div>
     );
 };

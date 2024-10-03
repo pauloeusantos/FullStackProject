@@ -1,8 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize'); // Importando o Sequelize
-const sequelize = new Sequelize('database', 'username', 'password', { // Criando a instância do Sequelize
-    host: 'localhost',
-    dialect: 'mysql' // ou outro dialeto que você esteja usando
-});
+const { sequelize, DataTypes } = require('../bd/bd');
+
 const Product = sequelize.define('Product', {
     name: {
         type: DataTypes.STRING,
