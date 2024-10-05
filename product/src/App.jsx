@@ -1,152 +1,144 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import axios from 'axios';
-import ProductForm from './components/ProductForm';
-import ProductList from './components/ProductList';
-import ProductDetail from './components/ProductDetail';
-import { Button, Card, Modal, Spinner } from 'flowbite-react';
-import { PlusIcon } from 'lucide-react';
-import { NotificationProvider, useNotification } from './contexts/NotificationContext';
-import { AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import axios from 'axios'
+import  ProductForm  from './components/ProductForm'
+import  ProductList  from './components/ProductList'
+import  ProductDetail  from './components/ProductDetail'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Toaster } from "@/components/ui/toaster"
+import { Loader2, Plus } from 'lucide-react'
 
 const AppContent = () => {
-    const [products, setProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [productToEdit, setProductToEdit] = useState(null);
-    const [isFormOpen, setIsFormOpen] = useState(false);
-    const { addNotification } = useNotification();
-    const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([])
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [productToEdit, setProductToEdit] = useState(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get('http://localhost:3001/api/products');
-            setProducts(response.data);
-        } catch (error) {
-            console.error("Erro ao buscar produtos:", error);
-            addNotification("Erro ao carregar produtos", "error");
-        } finally {
-            setLoading(false);
+  const fetchProducts = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get('http://localhost:3001/api/products')
+      setProducts(response.data)
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
+
+  const handleProductSelect = useCallback((product) => {
+    setSelectedProduct(product)
+  }, [])
+
+  const handleProductEdit = useCallback((product) => {
+    setProductToEdit(product)
+    setIsFormOpen(true)
+  }, [])
+
+  const handleProductDelete = useCallback(async (productId) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/products/${productId}`)
+      fetchProducts()
+      
+    } catch (error) {
+        console.error("Erro ao excluir produto:", error);
+    }
+  }, [fetchProducts])
+
+  const handleProductSave = useCallback(async (productData, isEditing) => {
+    try {
+        if (isEditing) {
+            await axios.put(`http://localhost:3001/api/products/${productData._id}`, productData);
+        } else {
+            await axios.post('http://localhost:3001/api/products', productData);
         }
-    }, [addNotification]);
-
-    useEffect(() => {
         fetchProducts();
-    }, [fetchProducts]);
+        setIsFormOpen(false);
+        setProductToEdit(null);
+    } catch (error) {
+        console.error("Erro ao salvar produto:", error);
+    }
+}, [fetchProducts]);
 
-    const handleProductSelect = useCallback((product) => {
-        setSelectedProduct(product);
-    }, []);
 
-    const handleProductEdit = useCallback((product) => {
-        setProductToEdit(product);
-        setIsFormOpen(true);
-    }, []);
+  const memoizedProductList = useMemo(() => (
+    <ProductList 
+      products={products} 
+      onProductSelect={handleProductSelect}
+      onProductEdit={handleProductEdit}
+      onProductDelete={handleProductDelete}
+    />
+  ), [products, handleProductSelect, handleProductEdit, handleProductDelete])
 
-    const handleProductDelete = useCallback(async (productId) => {
-        try {
-            await axios.delete(`http://localhost:3001/api/products/${productId}`);
-            fetchProducts();
-            addNotification("Produto excluído com sucesso", "success");
-        } catch (error) {
-            console.error("Erro ao excluir produto:", error);
-            addNotification("Erro ao excluir produto", "error");
-        }
-    }, [fetchProducts, addNotification]);
-
-    const handleProductSave = useCallback(async (productData, isEditing) => {
-        try {
-            if (isEditing) {
-                await axios.put(`http://localhost:3001/api/products/${productData._id}`, productData);
-                addNotification("Produto atualizado com sucesso", "success");
-            } else {
-                await axios.post('http://localhost:3001/api/products', productData);
-                addNotification("Produto adicionado com sucesso", "success");
-            }
-            fetchProducts();
-            setIsFormOpen(false);
-            setProductToEdit(null);
-        } catch (error) {
-            console.error("Erro ao salvar produto:", error);
-            addNotification("Erro ao salvar produto", "error");
-        }
-    }, [fetchProducts, addNotification]);
-
-    const memoizedProductList = useMemo(() => (
-        <ProductList 
-            products={products} 
-            onProductSelect={handleProductSelect}
-            onProductEdit={handleProductEdit}
-            onProductDelete={handleProductDelete}
-        />
-    ), [products, handleProductSelect, handleProductEdit, handleProductDelete]);
-
-    return (
-        <div className="min-h-screen bg-gray-100 py-8">
-            <div className="container mx-auto px-4">
-                <Card className="mb-8">
-                    <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-4xl font-bold text-gray-800">Gerenciamento de Produtos</h1>
-                        <Button onClick={() => setIsFormOpen(true)} color="success">
-                            <PlusIcon className="mr-2 h-4 w-4" /> Adicionar Produto
-                        </Button>
-                    </div>
-                </Card>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-2">
-                        <Card>
-                            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Lista de Produtos</h2>
-                            {loading ? (
-                                <div className="flex justify-center items-center h-64">
-                                    <Spinner size="xl" />
-                                </div>
-                            ) : memoizedProductList}
-                        </Card>
-                    </div>
-                    <div>
-                        <Card>
-                            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Detalhes do Produto</h2>
-                            {selectedProduct ? (
-                                <ProductDetail product={selectedProduct} />
-                            ) : (
-                                <p className="text-gray-500">Selecione um produto para ver os detalhes.</p>
-                            )}
-                        </Card>
-                    </div>
-                </div>
+  return (
+    <div className="min-h-screen bg-background py-8">
+      <div className="container mx-auto px-4">
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-4xl font-bold">Gerenciamento de Produtos</CardTitle>
+              <Button onClick={() => setIsFormOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" /> Adicionar Produto
+              </Button>
             </div>
+          </CardHeader>
+        </Card>
 
-            <Modal show={isFormOpen} onClose={() => setIsFormOpen(false)}>
-                <Modal.Header>
-                    {productToEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}
-                </Modal.Header>
-                <Modal.Body>
-                    <ProductForm 
-                        productToEdit={productToEdit}
-                        onSave={handleProductSave}
-                        onClose={() => setIsFormOpen(false)}
-                    />
-                </Modal.Body>
-            </Modal>
-
-            <AnimatePresence>
-                {notifications.map((notification) => (
-                    <Notification
-                        key={notification.id}
-                        id={notification.id}
-                        message={notification.message}
-                        type={notification.type}
-                    />
-                ))}
-            </AnimatePresence>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Lista de Produtos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                ) : memoizedProductList}
+              </CardContent>
+            </Card>
+          </div>
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Detalhes do Produto</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {selectedProduct ? (
+                  <ProductDetail product={selectedProduct} />
+                ) : (
+                  <p className="text-muted-foreground">Selecione um produto para ver os detalhes.</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-    );
-};
+      </div>
+
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen} className="bg-transparent">
+        <DialogContent className="bg-white bg-opacity-80">
+          <ProductForm 
+            productToEdit={productToEdit}
+            onSave={handleProductSave}
+            onClose={() => setIsFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Toaster />
+    </div>
+  )
+}
 
 const App = () => (
-    <NotificationProvider>
-        <AppContent />
-    </NotificationProvider>
-);
+  <AppContent />
+)
 
-export default App;
+export default App

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Cross2Icon } from "@radix-ui/react-icons"
+import { Cross} from "lucide-react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva } from "class-variance-authority";
 
@@ -64,7 +64,7 @@ const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
     )}
     toast-close=""
     {...props}>
-    <Cross2Icon className="h-4 w-4" />
+    <Cross className="h-4 w-4" />
   </ToastPrimitives.Close>
 ))
 ToastClose.displayName = ToastPrimitives.Close.displayName

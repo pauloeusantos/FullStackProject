@@ -1,21 +1,24 @@
+import React from 'react'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import PropTypes from 'prop-types';
-import { Card } from 'flowbite-react';
+
+
 
 const ProductDetail = ({ product }) => {
-    return (
-        <Card>
-            <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
-                {product.name}
-            </h5>
-            <p className="font-normal text-gray-700 dark:text-gray-400 mb-4">
-                {product.description}
-            </p>
-            <p className="font-bold text-lg text-green-600">
-                Preço: R$ {product.price.toFixed(2)}
-            </p>
-        </Card>
-    );
-};
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{product.name}</CardTitle>
+        <CardDescription>{product.description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-lg font-bold text-green-600">
+          Preço: R$ {product.price.toFixed(2)}
+        </p>
+      </CardContent>
+    </Card>
+  )
+}
 
 ProductDetail.propTypes = {
     product: PropTypes.shape({
