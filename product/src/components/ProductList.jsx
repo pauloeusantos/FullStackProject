@@ -69,7 +69,7 @@ const ActionCell = ({ row, onProductSelect, onProductEdit, onProductDelete }) =>
 
 ActionCell.propTypes = {
   row: PropTypes.object.isRequired,
-  onProductSelect: PropTypes.func.isRequired, // Adicionando validação para onProductSelect
+  onProductSelect: PropTypes.func.isRequired, 
   onProductEdit: PropTypes.func.isRequired,
   onProductDelete: PropTypes.func.isRequired,
 };

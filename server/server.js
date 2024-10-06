@@ -32,7 +32,7 @@ sequelize.sync();
 app.use(cors());
 app.use(express.json());
 
-// Servir arquivos estáticos do build do React
+
 app.use(express.static(path.join(__dirname, '../product/dist')));
 
 // Rotas da API
