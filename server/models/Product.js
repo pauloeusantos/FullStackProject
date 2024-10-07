@@ -1,12 +1,12 @@
-const { sequelize, DataTypes } = require('../bd/bd');
-
+const { sequelize } = require('../bd/bd');
+const { DataTypes } = require('sequelize');
 const Product = sequelize.define('Product', {
     name: {
         type: DataTypes.STRING,
         allowNull: false
     },
     description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
     },
     price: {
