@@ -1,13 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  flexRender,
-} from '@tanstack/react-table'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -18,146 +11,77 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Eye, Edit, Trash2 } from 'lucide-react'
-import PropTypes from 'prop-types';
+import api from '../service/index';
 
-const ActionCell = ({ row, onProductSelect, onProductEdit, onProductDelete }) => {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+// eslint-disable-next-line react/prop-types
+const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
+  const [products, setProducts] = useState([]);
 
-  return (
-    <>
-      <div className="flex space-x-2">
-        <Button size="sm" variant="outline" onClick={() => onProductSelect(row.original)}>
-          <Eye className="h-4 w-4" />
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => onProductEdit(row.original)}>
-          <Edit className="h-4 w-4" />
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => setShowDeleteDialog(true)}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir este produto?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => onProductDelete(row.original._id)}>
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  )
-}
+  useEffect(() => {
+    loadProducts();
+  }, []);
 
-ActionCell.propTypes = {
-  row: PropTypes.object.isRequired,
-  onProductSelect: PropTypes.func.isRequired, 
-  onProductEdit: PropTypes.func.isRequired,
-  onProductDelete: PropTypes.func.isRequired,
-};
-
-const ProductList = ({ products, onProductSelect, onProductEdit, onProductDelete }) => {
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: 'name',
-        header: 'Nome',
-      },
-      {
-        accessorKey: 'description',
-        header: 'Descrição',
-      },
-      {
-        accessorKey: 'price',
-        header: 'Preço',
-        cell: ({ getValue }) => `R$ ${(getValue()).toFixed(2)}`,
-      },
-      {
-        id: 'actions',
-        header: 'Ações',
-        cell: ({ row }) => (
-          <ActionCell
-            row={row}
-            onProductSelect={onProductSelect}
-            onProductEdit={onProductEdit}
-            onProductDelete={onProductDelete}
-          />
-        ),
-      },
-    ],
-    [onProductSelect, onProductEdit, onProductDelete]
-  )
-
-  const table = useReactTable({
-    data: products,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-  })
+  const loadProducts = async () => {
+    try {
+      const response = await api.get('/products'); 
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+    }
+  };
 
   return (
     <div>
+      <h2>Lista de Produtos</h2>
       <Input
-        value={(table.getColumn('name')?.getFilterValue() ?? '')}
-        onChange={(event) =>
-          table.getColumn('name')?.setFilterValue(event.target.value)
-        }
         placeholder="Pesquisar produtos..."
         className="max-w-sm mb-4"
+        onChange={(event) => {
+          const filterValue = event.target.value.toLowerCase();
+          setProducts((prevProducts) =>
+            prevProducts.filter((product) =>
+              product.name.toLowerCase().includes(filterValue)
+            )
+          );
+        }}
       />
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
+          <TableRow>
+            <TableHead>Nome</TableHead>
+            <TableHead>Descrição</TableHead>
+            <TableHead>Preço</TableHead>
+            <TableHead>Quantidade</TableHead>
+            <TableHead>Ações</TableHead>
+          </TableRow>
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+          {products.length ? (
+            products.map((product) => (
+              <TableRow key={product._id}>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.description}</TableCell>
+                <TableCell>R$ {product.price.toFixed(2)}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button size="sm" variant="outline" onClick={() => onProductSelect(product)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => onProductEdit(product)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => onProductDelete(product._id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell colSpan={5} className="h-24 text-center">
                 Nenhum resultado.
               </TableCell>
             </TableRow>
@@ -167,17 +91,5 @@ const ProductList = ({ products, onProductSelect, onProductEdit, onProductDelete
     </div>
   )
 }
-
-ProductList.propTypes = {
-  products: PropTypes.arrayOf(PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string,
-    description: PropTypes.string,
-    price: PropTypes.number
-  })).isRequired,
-  onProductSelect: PropTypes.func.isRequired,
-  onProductEdit: PropTypes.func.isRequired,
-  onProductDelete: PropTypes.func.isRequired
-};
 
 export default ProductList;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import axios from 'axios'
 import  ProductForm  from './components/ProductForm'
 import  ProductList  from './components/ProductList'
 import  ProductDetail  from './components/ProductDetail'
@@ -8,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Toaster } from "@/components/ui/toaster"
 import { Loader2, Plus } from 'lucide-react'
+import api from './service'
 
 const AppContent = () => {
   const [products, setProducts] = useState([])
@@ -19,7 +19,7 @@ const AppContent = () => {
   const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await axios.get('http://localhost:3001/api/products')
+      const response = await api.get('/products')
       setProducts(response.data)
     } catch (error) {
       console.error("Erro ao buscar produtos:", error)
@@ -43,7 +43,7 @@ const AppContent = () => {
 
   const handleProductDelete = useCallback(async (productId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/products/${productId}`)
+      await api.delete(`/products/${productId}`)
       fetchProducts()
       
     } catch (error) {
@@ -51,21 +51,20 @@ const AppContent = () => {
     }
   }, [fetchProducts])
 
-  const handleProductSave = useCallback(async (productData, isEditing) => {
+  const handleProductSave = useCallback(async (productData) => {
     try {
-        if (isEditing) {
-            await axios.put(`http://localhost:3001/api/products/${productData._id}`, productData);
-        } else {
-            await axios.post('http://localhost:3001/api/products', productData);
-        }
-        fetchProducts();
-        setIsFormOpen(false);
-        setProductToEdit(null);
+      if (productToEdit) {
+        await api.put(`/products/${productData._id}`, productData);
+      } else {
+        await api.post('/products', productData);
+      }
+      fetchProducts();
+      setIsFormOpen(false);
+      setProductToEdit(null);
     } catch (error) {
-        console.error("Erro ao salvar produto:", error);
+      console.error("Erro ao salvar produto:", error);
     }
-}, [fetchProducts]);
-
+  }, [fetchProducts, productToEdit]);
 
   const memoizedProductList = useMemo(() => (
     <ProductList 

@@ -1,6 +1,7 @@
 const { sequelize } = require('../bd/bd');
 const { DataTypes } = require('sequelize');
 const Product = sequelize.define('Product', {
+    
     name: {
         type: DataTypes.STRING,
         allowNull: false

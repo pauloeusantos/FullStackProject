@@ -1,33 +1,26 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import PropTypes from 'prop-types';
-import { AlertCircle } from 'lucide-react'
+import api from '../service'
 
+// eslint-disable-next-line react/prop-types
+const ProductForm = ({ productToEdit, onClose }) => {
 
-const ProductForm = ({ productToEdit, onSave, onClose }) => {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm()
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
-  useEffect(() => {
-    if (productToEdit) {
-      setValue('name', productToEdit.name)
-      setValue('description', productToEdit.description)
-      setValue('price', productToEdit.price)
+  const onSubmit = async (data) => {
+    try {
+      await api.post('/products', data);
+      reset();
+    } catch (error) {
+      console.error('Erro ao adicionar produto:', error);
     }
-  }, [productToEdit, setValue])
-
-  const onSubmit = (data) => {
-    onSave({
-      ...data,
-      price: Number(data.price),
-      _id: productToEdit?._id
-    }, !!productToEdit)
-  }
+  };
 
   return (
     <div>
@@ -45,8 +38,7 @@ const ProductForm = ({ productToEdit, onSave, onClose }) => {
           />
           {errors.name && (
             <p className="text-destructive text-sm flex items-center mt-1">
-              <AlertCircle className="w-4 h-4 mr-1" />
-              {errors.name.message }
+              {errors.name.message}
             </p>
           )}
         </div>
@@ -60,8 +52,7 @@ const ProductForm = ({ productToEdit, onSave, onClose }) => {
           />
           {errors.description && (
             <p className="text-destructive text-sm flex items-center mt-1">
-              <AlertCircle className="w-4 h-4 mr-1" />
-              {errors.description.message }
+              {errors.description.message}
             </p>
           )}
         </div>
@@ -80,8 +71,25 @@ const ProductForm = ({ productToEdit, onSave, onClose }) => {
           />
           {errors.price && (
             <p className="text-destructive text-sm flex items-center mt-1">
-              <AlertCircle className="w-4 h-4 mr-1" />
-              {errors.price.message }
+              {errors.price.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="quantity" className="text-primary">Quantidade</Label>
+          <Input
+            id="quantity"
+            type="number"
+            placeholder="Quantidade"
+            className="bg-transparent border-primary text-primary placeholder-primary/50"
+            {...register('quantity', { 
+              required: 'Quantidade é obrigatória', 
+              min: { value: 0, message: 'A quantidade deve ser maior que zero' }
+            })}
+          />
+          {errors.quantity && (
+            <p className="text-destructive text-sm flex items-center mt-1">
+              {errors.quantity.message}
             </p>
           )}
         </div>
@@ -97,16 +105,5 @@ const ProductForm = ({ productToEdit, onSave, onClose }) => {
     </div>
   )
 }
-
-ProductForm.propTypes = {
-    productToEdit: PropTypes.shape({
-        _id: PropTypes.string,
-        name: PropTypes.string,
-        description: PropTypes.string,
-        price: PropTypes.number
-    }),
-    onSave: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
-    };
 
 export default ProductForm;
