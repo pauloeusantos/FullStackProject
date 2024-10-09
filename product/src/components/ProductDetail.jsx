@@ -4,13 +4,23 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 // eslint-disable-next-line react/prop-types
 const ProductDetail = ({ product }) => {
   return (
-    <div>
-      <h2>{product.name}</h2>
-      <p>{product.description}</p>
-      <p>Preço: {product.price}</p>
-      <p>Quantidade: {product.quantity}</p>
-      <p>Categoria: {product.category}</p> {/* Exibindo a categoria */}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{product.name}</CardTitle>
+        <CardDescription>{product.description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-lg font-bold text-green-600">
+          Preço: R$ {product.price.toFixed(2)}
+        </p>
+        <p className="text-lg font-bold text-blue-600">
+          Quantidade: {product.quantity}
+        </p>
+        <p className="text-lg font-bold text-blue-600">
+          Categoria: {product.category}
+        </p>
+      </CardContent>
+    </Card>
   )
 }
 

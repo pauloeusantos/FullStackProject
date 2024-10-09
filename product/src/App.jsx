@@ -93,7 +93,6 @@ const App = () => {
               <option value="">Todas as Categorias</option>
               <option value="categoria1">Categoria 1</option>
               <option value="categoria2">Categoria 2</option>
-              {/* Adicione mais opções conforme necessário */}
             </select>
           </CardContent>
         </Card>
