@@ -17,6 +17,7 @@ import api from '../service/index';
 // eslint-disable-next-line react/prop-types
 const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadProducts();
@@ -25,6 +26,7 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
   const loadProducts = async () => {
     try {
       const response = await api.get('/products'); 
+      console.log('Produtos recebidos:', response.data); 
       setProducts(response.data);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
@@ -38,12 +40,7 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
         placeholder="Pesquisar produtos..."
         className="max-w-sm mb-4"
         onChange={(event) => {
-          const filterValue = event.target.value.toLowerCase();
-          setProducts((prevProducts) =>
-            prevProducts.filter((product) =>
-              product.name.toLowerCase().includes(filterValue)
-            )
-          );
+          setSearchTerm(event.target.value.toLowerCase());
         }}
       />
       <Table>
@@ -53,32 +50,38 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
             <TableHead>Descrição</TableHead>
             <TableHead>Preço</TableHead>
             <TableHead>Quantidade</TableHead>
+            <TableHead>Categoria</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {products.length ? (
-            products.map((product) => (
-              <TableRow key={product._id}>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>R$ {product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => onProductSelect(product)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => onProductEdit(product)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => onProductDelete(product._id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
+            products
+              .filter((product) =>
+                product.name.toLowerCase().includes(searchTerm)
+              )
+              .map((product) => (
+                <TableRow key={product._id}>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>R$ {product.price.toFixed(2)}</TableCell>
+                  <TableCell>{product.quantity}</TableCell>
+                  <TableCell>{product.category}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button size="sm" variant="outline" onClick={() => onProductSelect(product)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => onProductEdit(product)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => onProductDelete(product._id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center">

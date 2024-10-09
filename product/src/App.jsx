@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import  ProductForm  from './components/ProductForm'
 import  ProductList  from './components/ProductList'
 import  ProductDetail  from './components/ProductDetail'
@@ -8,13 +8,15 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Toaster } from "@/components/ui/toaster"
 import { Loader2, Plus } from 'lucide-react'
 import api from './service'
+import ProductChart from './components/ProductChart'
 
-const AppContent = () => {
+const App = () => {
   const [products, setProducts] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [productToEdit, setProductToEdit] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState('')
 
   const fetchProducts = useCallback(async () => {
     setLoading(true)
@@ -59,21 +61,20 @@ const AppContent = () => {
         await api.post('/products', productData);
       }
       fetchProducts();
-      setIsFormOpen(false);
+      setIsFormOpen(false); 
       setProductToEdit(null);
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
     }
   }, [fetchProducts, productToEdit]);
 
-  const memoizedProductList = useMemo(() => (
-    <ProductList 
-      products={products} 
-      onProductSelect={handleProductSelect}
-      onProductEdit={handleProductEdit}
-      onProductDelete={handleProductDelete}
-    />
-  ), [products, handleProductSelect, handleProductEdit, handleProductDelete])
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value)
+  }
+
+  const filteredProducts = selectedCategory
+    ? products.filter(product => product.category === selectedCategory)
+    : products
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -87,6 +88,14 @@ const AppContent = () => {
               </Button>
             </div>
           </CardHeader>
+          <CardContent>
+            <select onChange={handleCategoryChange} value={selectedCategory}>
+              <option value="">Todas as Categorias</option>
+              <option value="categoria1">Categoria 1</option>
+              <option value="categoria2">Categoria 2</option>
+              {/* Adicione mais opções conforme necessário */}
+            </select>
+          </CardContent>
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -100,7 +109,14 @@ const AppContent = () => {
                   <div className="flex justify-center items-center h-64">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
-                ) : memoizedProductList}
+                ) : (
+                  <ProductList 
+                    products={filteredProducts} 
+                    onProductSelect={handleProductSelect}
+                    onProductEdit={handleProductEdit}
+                    onProductDelete={handleProductDelete}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>
@@ -115,6 +131,16 @@ const AppContent = () => {
                 ) : (
                   <p className="text-muted-foreground">Selecione um produto para ver os detalhes.</p>
                 )}
+              </CardContent>
+            </Card>
+          </div>
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Gráfico de Produtos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ProductChart products={filteredProducts} />
               </CardContent>
             </Card>
           </div>
@@ -136,8 +162,4 @@ const AppContent = () => {
   )
 }
 
-const App = () => (
-  <AppContent />
-)
-
-export default App
+export default App;

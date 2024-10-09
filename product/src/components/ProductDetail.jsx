@@ -1,22 +1,16 @@
 import React from 'react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 
+// eslint-disable-next-line react/prop-types
 const ProductDetail = ({ product }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{product.name}</CardTitle>
-        <CardDescription>{product.description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-lg font-bold text-green-600">
-          Preço: R$ {product.price.toFixed(2)}
-        </p>
-        <p className="text-lg font-bold text-blue-600">
-          Quantidade: {product.quantity}
-        </p>
-      </CardContent>
-    </Card>
+    <div>
+      <h2>{product.name}</h2>
+      <p>{product.description}</p>
+      <p>Preço: {product.price}</p>
+      <p>Quantidade: {product.quantity}</p>
+      <p>Categoria: {product.category}</p> {/* Exibindo a categoria */}
+    </div>
   )
 }
 

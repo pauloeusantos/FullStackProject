@@ -17,6 +17,7 @@ const ProductForm = ({ productToEdit, onClose }) => {
     try {
       await api.post('/products', data);
       reset();
+      onClose();
     } catch (error) {
       console.error('Erro ao adicionar produto:', error);
     }
@@ -90,6 +91,20 @@ const ProductForm = ({ productToEdit, onClose }) => {
           {errors.quantity && (
             <p className="text-destructive text-sm flex items-center mt-1">
               {errors.quantity.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="category" className="text-primary">Categoria</Label>
+          <Input
+            id="category"
+            placeholder="Digite a categoria do produto"
+            className="bg-transparent border-primary text-primary placeholder-primary/50"
+            {...register('category', { required: 'Categoria é obrigatória' })}
+          />
+          {errors.category && (
+            <p className="text-destructive text-sm flex items-center mt-1">
+              {errors.category.message}
             </p>
           )}
         </div>
