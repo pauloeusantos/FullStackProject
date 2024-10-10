@@ -16,9 +16,6 @@ const ProductDetail = ({ product }) => {
         <p className="text-lg font-bold text-blue-600">
           Quantidade: {product.quantity}
         </p>
-        <p className="text-lg font-bold text-blue-600">
-          Categoria: {product.category}
-        </p>
       </CardContent>
     </Card>
   )

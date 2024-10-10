@@ -8,7 +8,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Toaster } from "@/components/ui/toaster"
 import { Loader2, Plus } from 'lucide-react'
 import api from './service'
-import ProductChart from './components/ProductChart'
+
 
 const App = () => {
   const [products, setProducts] = useState([])
@@ -16,7 +16,6 @@ const App = () => {
   const [productToEdit, setProductToEdit] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState('')
 
   const fetchProducts = useCallback(async () => {
     setLoading(true)
@@ -55,26 +54,24 @@ const App = () => {
 
   const handleProductSave = useCallback(async (productData) => {
     try {
-      if (productToEdit) {
-        await api.put(`/products/${productData._id}`, productData);
-      } else {
-        await api.post('/products', productData);
-      }
+      await api.post('/products', productData);
+      fetchProducts();
+      setIsFormOpen(false); 
+    } catch (error) {
+      console.error("Erro ao salvar produto:", error);
+    }
+  }, [fetchProducts]);
+
+  const handleProductUpdate = useCallback(async (productData) => {
+    try {
+      await api.put(`/products/${productData._id}`, productData);
       fetchProducts();
       setIsFormOpen(false); 
       setProductToEdit(null);
     } catch (error) {
-      console.error("Erro ao salvar produto:", error);
+      console.error("Erro ao atualizar produto:", error);
     }
-  }, [fetchProducts, productToEdit]);
-
-  const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value)
-  }
-
-  const filteredProducts = selectedCategory
-    ? products.filter(product => product.category === selectedCategory)
-    : products
+  }, [fetchProducts]);
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -89,11 +86,6 @@ const App = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <select onChange={handleCategoryChange} value={selectedCategory}>
-              <option value="">Todas as Categorias</option>
-              <option value="categoria1">Categoria 1</option>
-              <option value="categoria2">Categoria 2</option>
-            </select>
           </CardContent>
         </Card>
 
@@ -110,7 +102,7 @@ const App = () => {
                   </div>
                 ) : (
                   <ProductList 
-                    products={filteredProducts} 
+                    products={products} 
                     onProductSelect={handleProductSelect}
                     onProductEdit={handleProductEdit}
                     onProductDelete={handleProductDelete}
@@ -133,16 +125,6 @@ const App = () => {
               </CardContent>
             </Card>
           </div>
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Gráfico de Produtos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ProductChart products={filteredProducts} />
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
 
@@ -150,7 +132,8 @@ const App = () => {
         <DialogContent className="bg-white bg-opacity-80">
           <ProductForm 
             productToEdit={productToEdit}
-            onSave={handleProductSave}
+            onSave={handleProductSave} 
+            onUpdate={handleProductUpdate} 
             onClose={() => setIsFormOpen(false)}
           />
         </DialogContent>

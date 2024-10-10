@@ -50,7 +50,6 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
             <TableHead>Descrição</TableHead>
             <TableHead>Preço</TableHead>
             <TableHead>Quantidade</TableHead>
-            <TableHead>Categoria</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -66,7 +65,6 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
                   <TableCell>{product.description}</TableCell>
                   <TableCell>R$ {product.price.toFixed(2)}</TableCell>
                   <TableCell>{product.quantity}</TableCell>
-                  <TableCell>{product.category}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button size="sm" variant="outline" onClick={() => onProductSelect(product)}>

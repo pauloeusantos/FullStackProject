@@ -17,10 +17,6 @@ const Product = sequelize.define('Product', {
     quantity: {
         type: DataTypes.INTEGER,
         allowNull: false
-    },
-    category: {  // Novo campo para categoria
-        type: DataTypes.STRING,
-        allowNull: false
     }
 });
 
