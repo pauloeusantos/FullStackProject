@@ -18,41 +18,32 @@ const App = () => {
   const [loading, setLoading] = useState(true)
 
   const fetchProducts = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await api.get('/products')
-      setProducts(response.data)
+      const response = await api.get('/products');
+      setProducts(response.data);
     } catch (error) {
-      console.error("Erro ao buscar produtos:", error)
+      console.error("Erro ao buscar produtos:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }, [])
+
 
   useEffect(() => {
     fetchProducts()
   }, [fetchProducts])
 
-  const handleProductSelect = useCallback((product) => {
+  const handleProductSelect = (product) => {
     setSelectedProduct(product)
-  }, [])
+  };
 
-  const handleProductEdit = useCallback((product) => {
+  const handleProductEdit = (product) => {
     setProductToEdit(product)
     setIsFormOpen(true)
-  }, [])
+  };
 
-  const handleProductDelete = useCallback(async (productId) => {
-    try {
-      await api.delete(`/products/${productId}`)
-      fetchProducts()
-      
-    } catch (error) {
-        console.error("Erro ao excluir produto:", error);
-    }
-  }, [fetchProducts])
-
-  const handleProductSave = useCallback(async (productData) => {
+  const handleProductSave = async (productData) => {
     try {
       await api.post('/products', productData);
       fetchProducts();
@@ -60,9 +51,9 @@ const App = () => {
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
     }
-  }, [fetchProducts]);
+  };
 
-  const handleProductUpdate = useCallback(async (productData) => {
+  const handleProductUpdate = async (productData) => {
     try {
       await api.put(`/products/${productData._id}`, productData);
       fetchProducts();
@@ -71,7 +62,7 @@ const App = () => {
     } catch (error) {
       console.error("Erro ao atualizar produto:", error);
     }
-  }, [fetchProducts]);
+  };
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -105,7 +96,6 @@ const App = () => {
                     products={products} 
                     onProductSelect={handleProductSelect}
                     onProductEdit={handleProductEdit}
-                    onProductDelete={handleProductDelete}
                   />
                 )}
               </CardContent>
@@ -142,6 +132,7 @@ const App = () => {
       <Toaster />
     </div>
   )
-}
+};
+
 
 export default App;

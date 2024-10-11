@@ -15,7 +15,7 @@ import { Eye, Edit, Trash2 } from 'lucide-react'
 import api from '../service/index';
 
 // eslint-disable-next-line react/prop-types
-const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
+const ProductList = ({ onProductSelect, onProductEdit }) => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -30,6 +30,16 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
       setProducts(response.data);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
+    }
+  };
+
+  const handleProductDelete = async (productId) => {
+    try {
+      await api.delete(`/products/${productId}`)
+      loadProducts()
+      
+    } catch (error) {
+        console.error("Erro ao excluir produto:", error);
     }
   };
 
@@ -73,7 +83,7 @@ const ProductList = ({ onProductSelect, onProductEdit, onProductDelete }) => {
                       <Button size="sm" variant="outline" onClick={() => onProductEdit(product)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => onProductDelete(product._id)}>
+                      <Button size="sm" variant="outline" onClick={() => handleProductDelete(product._id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
