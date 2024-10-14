@@ -1,4 +1,3 @@
-'use client'
 
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
@@ -20,23 +19,23 @@ const ProductList = ({ onProductSelect, onProductEdit }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    loadProducts();
+    fetchProducts();
   }, []);
 
-  const loadProducts = async () => {
+  const fetchProducts = async () => {
     try {
-      const response = await api.get('/products'); 
-      console.log('Produtos recebidos:', response.data); 
+      const response = await api.get('/products');
       setProducts(response.data);
     } catch (error) {
-      console.error('Erro ao carregar produtos:', error);
-    }
+      console.error("Erro ao buscar produtos:", error);
+    } 
   };
+
 
   const handleProductDelete = async (productId) => {
     try {
       await api.delete(`/products/${productId}`)
-      loadProducts()
+      fetchProducts()
       
     } catch (error) {
         console.error("Erro ao excluir produto:", error);
@@ -45,7 +44,7 @@ const ProductList = ({ onProductSelect, onProductEdit }) => {
 
   return (
     <div>
-      <h2>Lista de Produtos</h2>
+      <h2>Produtos</h2>
       <Input
         placeholder="Pesquisar produtos..."
         className="max-w-sm mb-4"

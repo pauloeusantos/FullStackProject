@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect} from 'react'
 import  ProductForm  from './components/ProductForm'
 import  ProductList  from './components/ProductList'
 import  ProductDetail  from './components/ProductDetail'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Toaster } from "@/components/ui/toaster"
 import { Loader2, Plus } from 'lucide-react'
 import api from './service'
 
@@ -17,7 +16,7 @@ const App = () => {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await api.get('/products');
@@ -27,12 +26,12 @@ const App = () => {
     } finally {
       setLoading(false);
     }
-  }, [])
+  };
 
 
   useEffect(() => {
     fetchProducts()
-  }, [fetchProducts])
+  }, []);
 
   const handleProductSelect = (product) => {
     setSelectedProduct(product)
@@ -129,7 +128,7 @@ const App = () => {
         </DialogContent>
       </Dialog>
 
-      <Toaster />
+     
     </div>
   )
 };
