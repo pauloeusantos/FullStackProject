@@ -1,8 +1,7 @@
-const sequelize = require('sequelize');
-const Product = require('./models/Product');
+import { sequelize } from "./bd/bd.js"
 
-sequelize.sync({force: true}).then(() => {
-    console.log('Banco de dados sincronizado');
+sequelize.sync({alter: true}).then(() => {
+    console.log("Banco está sincronizado.")
 }).catch((error) => {
-    console.error('Erro ao sincronizar o banco de dados:', error);
-});
+    console.error(`Erro ao sincronizar: ${error}`)
+})

@@ -1,5 +1,6 @@
-const express = require('express');
-const Product = require('../models/Product');
+import express from "express";
+import Product from "../models/Product.js";
+
 const router = express.Router();
 
 
@@ -13,7 +14,6 @@ router.post('/products', async (req, res) => {
     res.status(201).json(product);
 });
 
-
 router.put('/products/:id', async (req, res) => {
     const { id } = req.params;
     await Product.update(req.body, { where: { id } });
@@ -26,4 +26,4 @@ router.delete('/products/:id', async (req, res) => {
     res.json({ message: 'Produto deletado com sucesso' });
 });
 
-module.exports = router;
+export default router;

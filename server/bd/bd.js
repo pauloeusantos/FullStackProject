@@ -1,8 +1,15 @@
-const { Sequelize } = require('sequelize'); 
+import { Sequelize } from "sequelize"
 
-const sequelize = new Sequelize('dbase', 'root', '', { 
+export const sequelize = new Sequelize('dbase', 'root', '', {
     host: 'localhost',
-    dialect: 'mysql'
-});
+    dialect: 'sqlite',
+})
 
-module.exports = { sequelize };
+try {
+    await sequelize.authenticate()
+    console.log("Conectado com sucesso")
+} catch(erro) {
+    console.error("Nao foi possivel conectar", erro)
+}
+
+export default sequelize

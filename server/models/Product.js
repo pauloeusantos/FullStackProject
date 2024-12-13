@@ -1,5 +1,5 @@
-const { sequelize } = require('../bd/bd');
-const { DataTypes } = require('sequelize');
+import { sequelize } from "../bd/bd.js";
+import { DataTypes } from 'sequelize';
 const Product = sequelize.define('Product', {
     
     name: {
@@ -18,6 +18,11 @@ const Product = sequelize.define('Product', {
         type: DataTypes.INTEGER,
         allowNull: false
     }
+}, {
+    freezeTableName: true,
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
-module.exports = Product;
+export default Product;
